@@ -1,32 +1,42 @@
 # Covid-19-Austria data import & graphical dashboard
 
-scripts that i use to download and visualize covid-19 related data of austria. maybe it is useful for others too.
+Scripts that i use to download and visualize covid-19 related data of austria. maybe it's useful for others too.
 
-It produces a grafana dashboard that looks like this (Snapshot of 06. November 2020):
+It produces a grafana dashboard that looks like this snapshot of 06. November 2020:
 
 ![Dashboard-Snapshot](dashboard-snapshot-2020-11-06.png)
 
 ## Usage
 
-please be aware that this is ripped out of a another data gathering process of mine, i do not use this exact setup, so expect some quirks im not aware of.
+### Status
 
-also, be aware that currently the Infoboxes in the second row "% Tested / Positive" , "Positive Grow", "Hospital Grow", "Intensive Grow", "Deaths Grow" do not always display the latest value depending the ZoomWindow and current DateTime.
+*Please be aware that this is ripped out of a another data gathering process of mine, and i do not use this exact setup. the boilerplate
+code (dockerfile, docker-compose, influxdb.conf datasources.yml) is partly stub and needs polish before it works as expected.*
+
++ the `import-covid19-austria.sh` script works
++ the `covid-19-austria.json` grafana dashboard works
+
+#### Limitations
+
+currently the Infoboxes in the second row "% Tested / Positive" , "Positive Grow", "Hospital Grow", "Intensive Grow", "Deaths Grow" do not always display the latest value depending the ZoomWindow and current DateTime.
 
 ### Requisites
 
-+ docker & docker-compose or compatible (eg. podman & podman-compose)
++ docker & docker-compose or compatible (eg. podman & podman-compose).
+
+    as docker and docker-compose is available for windows and macos, this should also work on windows and macos.
 
 ### setup
 
 + copy `example.env` to `.env` and edit to your needs
 + start scripts `docker-compose up`
 + import old data `docker-compose exec ./snapshot-2020-11-06.opentsdb`
-+ start webbrowser, connect with grafana at https://localhost:3000
++ start webbrowser, connect with grafana at http://localhost:3000
 + import dashboard `covid-19-austria.json`
 
 ### start
 + start scripts, if not already started: `docker-compose up`
-+ start webbrowser, connect with grafana at https://localhost:3000
++ start webbrowser, connect with grafana at http://localhost:3000
 + stop scripts: `docker-compose down`
 
 ## Implementation
