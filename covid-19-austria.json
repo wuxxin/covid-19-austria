@@ -30,7 +30,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "semi-dark-yellow",
+                  "color": "light-blue",
                   "value": null
                 }
               ]
@@ -644,13 +644,13 @@
             "groupBy": [
               {
                 "params": [
-                  "24h"
+                  "1d"
                 ],
                 "type": "time"
               },
               {
                 "params": [
-                  "linear"
+                  "0"
                 ],
                 "type": "fill"
               }
@@ -659,7 +659,7 @@
             "measurement": "covid19_tests",
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT difference(distinct(\"value\")) FROM \"covid19_tests\" WHERE $timeFilter GROUP BY time(24h) fill(0)",
+            "query": "SELECT difference(sum(\"value\")) FROM \"covid19_tests\" WHERE $timeFilter GROUP BY time(1d) fill(none)",
             "rawQuery": false,
             "refId": "A",
             "resultFormat": "time_series",
@@ -687,7 +687,7 @@
             "groupBy": [
               {
                 "params": [
-                  "24h"
+                  "1d"
                 ],
                 "type": "time"
               },
@@ -702,6 +702,8 @@
             "measurement": "covid19_new",
             "orderByTime": "ASC",
             "policy": "default",
+            "query": "SELECT sum(\"value\") FROM \"covid19_new\" WHERE $timeFilter GROUP BY time(1d) fill(none)",
+            "rawQuery": false,
             "refId": "B",
             "resultFormat": "time_series",
             "select": [
@@ -714,7 +716,7 @@
                 },
                 {
                   "params": [],
-                  "type": "mean"
+                  "type": "sum"
                 }
               ]
             ],
@@ -728,28 +730,29 @@
           {
             "id": "calculateField",
             "options": {
-              "alias": "100_mul_new_positive",
+              "alias": "covid19_new_diff_tests",
               "binary": {
-                "left": "100",
-                "operator": "*",
+                "left": "covid19_new.sum",
+                "operator": "/",
                 "reducer": "sum",
-                "right": "covid19_new.mean"
+                "right": "covid19_tests.difference"
               },
               "mode": "binary",
               "reduce": {
                 "reducer": "sum"
-              }
+              },
+              "replaceFields": false
             }
           },
           {
             "id": "calculateField",
             "options": {
-              "alias": "test_percent_positive",
+              "alias": "covid19_percent_positive_tests",
               "binary": {
-                "left": "100_mul_new_positive",
-                "operator": "/",
+                "left": "covid19_new_diff_tests",
+                "operator": "*",
                 "reducer": "sum",
-                "right": "covid19_tests.difference"
+                "right": "100"
               },
               "mode": "binary",
               "reduce": {
@@ -775,19 +778,19 @@
                   "value": null
                 },
                 {
-                  "color": "light-yellow",
+                  "color": "semi-dark-yellow",
                   "value": 0
                 },
                 {
-                  "color": "semi-dark-orange",
+                  "color": "dark-orange",
                   "value": 5
                 },
                 {
-                  "color": "semi-dark-red",
+                  "color": "dark-red",
                   "value": 10
                 },
                 {
-                  "color": "semi-dark-purple",
+                  "color": "dark-purple",
                   "value": 15
                 }
               ]
@@ -837,6 +840,8 @@
             "measurement": "covid19_growth24",
             "orderByTime": "ASC",
             "policy": "default",
+            "query": "SELECT distinct(\"value\") FROM \"covid19_growth24\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+            "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
             "select": [
@@ -871,8 +876,24 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "semi-dark-orange",
+                  "color": "dark-green",
                   "value": null
+                },
+                {
+                  "color": "semi-dark-yellow",
+                  "value": 0
+                },
+                {
+                  "color": "dark-orange",
+                  "value": 5
+                },
+                {
+                  "color": "dark-red",
+                  "value": 10
+                },
+                {
+                  "color": "dark-purple",
+                  "value": 15
                 }
               ]
             },
@@ -957,8 +978,24 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "semi-dark-red",
+                  "color": "dark-green",
                   "value": null
+                },
+                {
+                  "color": "semi-dark-yellow",
+                  "value": 0
+                },
+                {
+                  "color": "dark-orange",
+                  "value": 5
+                },
+                {
+                  "color": "dark-red",
+                  "value": 10
+                },
+                {
+                  "color": "dark-purple",
+                  "value": 15
                 }
               ]
             },
@@ -1043,8 +1080,24 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "dark-purple",
+                  "color": "dark-green",
                   "value": null
+                },
+                {
+                  "color": "semi-dark-yellow",
+                  "value": 0
+                },
+                {
+                  "color": "dark-orange",
+                  "value": 5
+                },
+                {
+                  "color": "dark-red",
+                  "value": 10
+                },
+                {
+                  "color": "dark-purple",
+                  "value": 15
                 }
               ]
             },
@@ -1206,7 +1259,7 @@
                 },
                 {
                   "params": [],
-                  "type": "distinct"
+                  "type": "max"
                 }
               ]
             ],
@@ -1507,7 +1560,8 @@
                   "value": null
                 }
               ]
-            }
+            },
+            "unit": "percentunit"
           },
           "overrides": []
         },
@@ -1542,8 +1596,8 @@
         },
         "percentage": false,
         "pluginVersion": "7.3.1",
-        "pointradius": 2,
-        "points": false,
+        "pointradius": 0.5,
+        "points": true,
         "renderer": "flot",
         "seriesOverrides": [],
         "spaceLength": 10,
@@ -1554,13 +1608,13 @@
             "groupBy": [
               {
                 "params": [
-                  "24h"
+                  "1d"
                 ],
                 "type": "time"
               },
               {
                 "params": [
-                  "linear"
+                  "0"
                 ],
                 "type": "fill"
               }
@@ -1569,7 +1623,7 @@
             "measurement": "covid19_tests",
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT difference(distinct(\"value\")) FROM \"covid19_tests\" WHERE $timeFilter GROUP BY time(24h) fill(0)",
+            "query": "SELECT difference(sum(\"value\")) FROM \"covid19_tests\" WHERE $timeFilter GROUP BY time(1d) fill(null)",
             "rawQuery": false,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1583,7 +1637,7 @@
                 },
                 {
                   "params": [],
-                  "type": "sum"
+                  "type": "distinct"
                 },
                 {
                   "params": [],
@@ -1597,13 +1651,13 @@
             "groupBy": [
               {
                 "params": [
-                  "24h"
+                  "1d"
                 ],
                 "type": "time"
               },
               {
                 "params": [
-                  "none"
+                  "0"
                 ],
                 "type": "fill"
               }
@@ -1612,6 +1666,8 @@
             "measurement": "covid19_new",
             "orderByTime": "ASC",
             "policy": "default",
+            "query": "SELECT distinct(\"value\") FROM \"covid19_new\" WHERE $timeFilter GROUP BY time(1d) fill(null)",
+            "rawQuery": false,
             "refId": "B",
             "resultFormat": "time_series",
             "select": [
@@ -1624,7 +1680,7 @@
                 },
                 {
                   "params": [],
-                  "type": "mean"
+                  "type": "last"
                 }
               ]
             ],
@@ -1634,22 +1690,22 @@
         "thresholds": [
           {
             "$$hashKey": "object:889",
-            "colorMode": "custom",
+            "colorMode": "warning",
             "fill": false,
             "fillColor": "rgba(51, 162, 229, 0.2)",
             "line": true,
             "lineColor": "rgba(31, 96, 196, 0.6)",
             "op": "gt",
-            "value": 5,
+            "value": 0.05,
             "yaxis": "left"
           },
           {
             "$$hashKey": "object:895",
             "colorMode": "critical",
-            "fill": false,
+            "fill": true,
             "line": true,
             "op": "gt",
-            "value": 10,
+            "value": 0.1,
             "yaxis": "left"
           }
         ],
@@ -1666,25 +1722,9 @@
           {
             "id": "calculateField",
             "options": {
-              "alias": "100_mul_new_positive",
+              "alias": "covid19_percent_of_tests_positive",
               "binary": {
-                "left": "100",
-                "operator": "*",
-                "reducer": "sum",
-                "right": "covid19_new.mean"
-              },
-              "mode": "binary",
-              "reduce": {
-                "reducer": "sum"
-              }
-            }
-          },
-          {
-            "id": "calculateField",
-            "options": {
-              "alias": "test_percent_positive",
-              "binary": {
-                "left": "100_mul_new_positive",
+                "left": "covid19_new.last",
                 "operator": "/",
                 "reducer": "sum",
                 "right": "covid19_tests.difference"
@@ -1708,7 +1748,7 @@
         "yaxes": [
           {
             "$$hashKey": "object:841",
-            "format": "short",
+            "format": "percentunit",
             "label": null,
             "logBase": 1,
             "max": null,
@@ -3213,7 +3253,7 @@
     "timezone": "",
     "title": "Covid-19 Austria",
     "uid": "FmM6jcrZz",
-    "version": 91
+    "version": 100
   },
   "overwrite": true
 }
