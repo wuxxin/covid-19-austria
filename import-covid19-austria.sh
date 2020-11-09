@@ -14,7 +14,7 @@ self=$(readlink -e "$0")
 
 for i in curl html2text jinja2; do if ! which $i > /dev/null; then
     echo "error, missing command $i; try 'apt-get install curl html2text; pip install jinja2-cli'"
-    exit 11
+    exit 1
 fi; done
 
 # update json structure [{'dataTime':'isoformat'},] with [{'timestamp':'unixepoch'},]
