@@ -2,9 +2,9 @@
 
 Scripts that i use to download and visualize covid-19 related data of austria. maybe it's useful for others too.
 
-It produces a grafana dashboard that looks like this snapshot of 06. November 2020:
+It produces a grafana dashboard that looks like this snapshot of 15. November 2020:
 
-![Dashboard-Snapshot](dashboard-snapshot-2020-11-06.png)
+![Dashboard-Snapshot](dashboard-snapshot-2020-11-15.png)
 
 ## Usage
 
