@@ -34,25 +34,30 @@ sminfo_raw=$(curl -s "https://www.sozialministerium.at/Informationen-zum-Coronav
 extract_timestamp="s/.+Stand +([0-9]+).([0-9]+).([0-9]+)[^0-9]+([0-9]+:[0-9]+).+Uhr.*/\3-\2-\1T\4:00/g"
 extract_value="s/.+ +([0-9.]+) *$/\1/g"
 smdeath_timestamp=$(date --date=$(printf "%s" "${sminfo_raw}" | \
-    grep "Todesfälle" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
+    grep "^Todesfälle" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
 smhospital_timestamp=$(date --date=$(printf "%s" "${sminfo_raw}" | \
-    grep "Hospitalisierung" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
+    grep "^Hospitalisierung" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
 smintensive_timestamp=$(date --date=$(printf "%s" "${sminfo_raw}" | \
-    grep "Intensivstation" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
+    grep "^Intensivstation" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
+smrecovered_timestamp=$(date --date=$(printf "%s" "${sminfo_raw}" | \
+    grep "^Genesen" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
 smtests_timestamp=$(date --date=$(printf "%s" "${sminfo_raw}" | \
-    grep "Testungen" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
-smdeath=$(printf "%s" "${sminfo_raw}" | grep "Todesfälle" | \
+    grep "^Testungen" -A 1 | grep Stand | sed -r "$extract_timestamp") +%s)
+smdeath=$(printf "%s" "${sminfo_raw}" | grep "^Todesfälle" | \
     sed -r "$extract_value" | tr -d ".")
-smhospital=$(printf "%s" "${sminfo_raw}" | grep "Hospitalisierung" | \
+smhospital=$(printf "%s" "${sminfo_raw}" | grep "^Hospitalisierung" | \
     sed -r "$extract_value" | tr -d ".")
-smintensive=$(printf "%s" "${sminfo_raw}" | grep "Intensivstation" | \
+smintensive=$(printf "%s" "${sminfo_raw}" | grep "^Intensivstation" | \
     sed -r "$extract_value" | tr -d ".")
-smtests=$(printf "%s" "${sminfo_raw}" | grep "Testungen" | \
+smrecovered=$(printf "%s" "${sminfo_raw}" | grep "^Genesen" | \
+    sed -r "$extract_value" | tr -d ".")
+smtests=$(printf "%s" "${sminfo_raw}" | grep "^Testungen" | \
     sed -r "$extract_value" | tr -d ".")
 sminfo="[
     {\"timestamp\": \"${smdeath_timestamp}\", \"death\": \"${smdeath}\"},
     {\"timestamp\": \"${smhospital_timestamp}\", \"hospital\": \"${smhospital}\"},
     {\"timestamp\": \"${smintensive_timestamp}\", \"intensive\": \"${smintensive}\"},
+    {\"timestamp\": \"${smrecovered_timestamp}\", \"recovered\": \"${smrecovered}\"},
     {\"timestamp\": \"${smtests_timestamp}\", \"tests\": \"${smtests}\"}
 ]"
 
