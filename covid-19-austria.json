@@ -59,7 +59,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -136,7 +136,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -225,7 +225,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -309,7 +309,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -392,7 +392,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -475,7 +475,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -521,10 +521,43 @@
       },
       {
         "datasource": null,
-        "description": "",
         "fieldConfig": {
           "defaults": {
-            "custom": {}
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {},
+            "mappings": [],
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "light-green",
+                  "value": null
+                },
+                {
+                  "color": "light-yellow",
+                  "value": 2000
+                },
+                {
+                  "color": "dark-yellow",
+                  "value": 4000
+                },
+                {
+                  "color": "semi-dark-orange",
+                  "value": 8000
+                },
+                {
+                  "color": "semi-dark-red",
+                  "value": 16000
+                },
+                {
+                  "color": "semi-dark-purple",
+                  "value": 32000
+                }
+              ]
+            }
           },
           "overrides": []
         },
@@ -534,12 +567,22 @@
           "x": 0,
           "y": 5
         },
-        "id": 42,
+        "id": 52,
         "options": {
-          "content": "+ % Tested / Positive (both Singlestat and Graph) is failing depending zoom section\n",
-          "mode": "markdown"
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -551,11 +594,49 @@
               },
               {
                 "params": [
-                  "null"
+                  "previous"
                 ],
                 "type": "fill"
               }
             ],
+            "measurement": "covid19_confirmed",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "last"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "previous"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "measurement": "covid19_recovered",
             "orderByTime": "ASC",
             "policy": "default",
             "refId": "A",
@@ -570,7 +651,43 @@
                 },
                 {
                   "params": [],
-                  "type": "mean"
+                  "type": "last"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "previous"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "covid19_death",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "last"
                 }
               ]
             ],
@@ -579,15 +696,51 @@
         ],
         "timeFrom": null,
         "timeShift": null,
-        "title": "Known Issues",
-        "type": "text"
+        "title": "Current Active",
+        "transformations": [
+          {
+            "id": "calculateField",
+            "options": {
+              "binary": {
+                "left": "covid19_confirmed.last",
+                "operator": "-",
+                "reducer": "sum",
+                "right": "covid19_recovered.last"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              },
+              "replaceFields": false
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "binary": {
+                "left": "covid19_confirmed.last - covid19_recovered.last",
+                "operator": "-",
+                "reducer": "sum",
+                "right": "covid19_death.last"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              },
+              "replaceFields": true
+            }
+          }
+        ],
+        "type": "stat"
       },
       {
         "datasource": null,
+        "description": "% Tested / Positive (both Singlestat and Graph) is failing depending zoom section",
         "fieldConfig": {
           "defaults": {
             "custom": {},
             "mappings": [],
+            "max": 50,
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -604,7 +757,7 @@
                   "value": 4
                 },
                 {
-                  "color": "light-yellow",
+                  "color": "semi-dark-orange",
                   "value": 5
                 },
                 {
@@ -638,7 +791,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -650,7 +803,7 @@
               },
               {
                 "params": [
-                  "0"
+                  "linear"
                 ],
                 "type": "fill"
               }
@@ -820,7 +973,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -859,47 +1012,11 @@
               ]
             ],
             "tags": []
-          },
-          {
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "measurement": "covid19_con",
-            "orderByTime": "ASC",
-            "policy": "default",
-            "refId": "B",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
           }
         ],
         "timeFrom": null,
         "timeShift": null,
-        "title": "Positive Grow",
+        "title": "Tested Positive Diff",
         "type": "stat"
       },
       {
@@ -958,7 +1075,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -978,7 +1095,7 @@
             "measurement": "covid19_hospital",
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT 100 * difference(last(\"value\")) / last(\"value\") FROM \"covid19_hospital\" WHERE $timeFilter GROUP BY time(1d) fill(null)",
+            "query": "SELECT 100 * difference(last(\"value\")) / last(\"value\")  FROM \"covid19_hospital\" WHERE $timeFilter GROUP BY time(1d) fill(null)",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1001,7 +1118,7 @@
         ],
         "timeFrom": null,
         "timeShift": null,
-        "title": "Hospital Grow",
+        "title": "Hospital Diff",
         "type": "stat"
       },
       {
@@ -1060,7 +1177,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -1080,7 +1197,7 @@
             "measurement": "covid19_intensive",
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT 100 * difference(last(\"value\")) / last(\"value\") FROM \"covid19_intensive\" WHERE $timeFilter GROUP BY time(1d) fill(null)",
+            "query": "SELECT 100 * difference(last(\"value\")) / last(\"value\")  FROM \"covid19_intensive\"  WHERE $timeFilter GROUP BY time(1d) fill(none)",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1103,7 +1220,7 @@
         ],
         "timeFrom": null,
         "timeShift": null,
-        "title": "Intensiv Grow",
+        "title": "Intensiv Diff",
         "type": "stat"
       },
       {
@@ -1162,7 +1279,7 @@
           },
           "textMode": "auto"
         },
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "targets": [
           {
             "groupBy": [
@@ -1182,7 +1299,7 @@
             "measurement": "covid19_death",
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT 100 * difference(last(\"value\")) / last(\"value\") FROM \"covid19_death\" WHERE $timeFilter GROUP BY time(1d) fill(null)",
+            "query": "SELECT 100 * difference(last(\"value\")) / last(\"value\")  FROM \"covid19_death\" WHERE $timeFilter GROUP BY time(1d) fill(null)",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -1205,7 +1322,7 @@
         ],
         "timeFrom": null,
         "timeShift": null,
-        "title": "Deaths Growth",
+        "title": "Deaths Diff",
         "type": "stat"
       },
       {
@@ -1248,7 +1365,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1257,6 +1374,7 @@
             "$$hashKey": "object:677",
             "alias": "covid19_new.moving_average",
             "fill": 0,
+            "linewidth": 2,
             "points": false
           }
         ],
@@ -1295,7 +1413,7 @@
                 },
                 {
                   "params": [],
-                  "type": "max"
+                  "type": "last"
                 }
               ]
             ],
@@ -1306,7 +1424,7 @@
             "groupBy": [
               {
                 "params": [
-                  "24h"
+                  "1d"
                 ],
                 "type": "time"
               },
@@ -1332,7 +1450,7 @@
                 },
                 {
                   "params": [],
-                  "type": "max"
+                  "type": "last"
                 },
                 {
                   "params": [
@@ -1430,7 +1548,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1439,6 +1557,7 @@
             "$$hashKey": "object:1282",
             "alias": "covid19_growth24.last(48h)",
             "fill": 0,
+            "linewidth": 2,
             "points": false
           }
         ],
@@ -1584,6 +1703,7 @@
         "dashes": false,
         "datasource": null,
         "decimals": 2,
+        "description": "% Tested / Positive (both Singlestat and Graph) is failing depending zoom section",
         "fieldConfig": {
           "defaults": {
             "custom": {},
@@ -1631,7 +1751,7 @@
           "alertThreshold": false
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 0.5,
         "points": true,
         "renderer": "flot",
@@ -1846,7 +1966,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -1958,13 +2078,14 @@
           "y": 26
         },
         "hiddenSeries": false,
-        "id": 31,
+        "id": 49,
         "legend": {
-          "alignAsTable": true,
-          "avg": true,
+          "alignAsTable": false,
+          "avg": false,
           "current": true,
-          "max": true,
-          "min": true,
+          "max": false,
+          "min": false,
+          "rightSide": false,
           "show": true,
           "total": false,
           "values": true
@@ -1976,17 +2097,11 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
-        "seriesOverrides": [
-          {
-            "alias": "covid19_intensive.distinct",
-            "fill": 0,
-            "yaxis": 2
-          }
-        ],
+        "seriesOverrides": [],
         "spaceLength": 10,
         "stack": false,
         "steppedLine": false,
@@ -2001,15 +2116,15 @@
               },
               {
                 "params": [
-                  "linear"
+                  "previous"
                 ],
                 "type": "fill"
               }
             ],
-            "measurement": "covid19_hospital",
+            "measurement": "covid19_confirmed",
             "orderByTime": "ASC",
             "policy": "default",
-            "refId": "A",
+            "refId": "B",
             "resultFormat": "time_series",
             "select": [
               [
@@ -2021,7 +2136,7 @@
                 },
                 {
                   "params": [],
-                  "type": "distinct"
+                  "type": "last"
                 }
               ]
             ],
@@ -2037,17 +2152,16 @@
               },
               {
                 "params": [
-                  "linear"
+                  "previous"
                 ],
                 "type": "fill"
               }
             ],
-            "measurement": "covid19_intensive",
+            "hide": false,
+            "measurement": "covid19_recovered",
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "SELECT mean(\"value\") FROM \"covid19_intensive\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-            "rawQuery": false,
-            "refId": "B",
+            "refId": "A",
             "resultFormat": "time_series",
             "select": [
               [
@@ -2059,7 +2173,43 @@
                 },
                 {
                   "params": [],
-                  "type": "distinct"
+                  "type": "last"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "previous"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "covid19_death",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "last"
                 }
               ]
             ],
@@ -2070,12 +2220,46 @@
         "timeFrom": null,
         "timeRegions": [],
         "timeShift": null,
-        "title": "Hospitalized and Intensive Care",
+        "title": "Current Active",
         "tooltip": {
           "shared": true,
           "sort": 0,
           "value_type": "individual"
         },
+        "transformations": [
+          {
+            "id": "calculateField",
+            "options": {
+              "binary": {
+                "left": "covid19_confirmed.last",
+                "operator": "-",
+                "reducer": "sum",
+                "right": "covid19_recovered.last"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              },
+              "replaceFields": false
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "binary": {
+                "left": "covid19_confirmed.last - covid19_recovered.last",
+                "operator": "-",
+                "reducer": "sum",
+                "right": "covid19_death.last"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              },
+              "replaceFields": true
+            }
+          }
+        ],
         "type": "graph",
         "xaxis": {
           "buckets": null,
@@ -2086,14 +2270,16 @@
         },
         "yaxes": [
           {
+            "$$hashKey": "object:1175",
             "format": "short",
             "label": null,
             "logBase": 1,
             "max": null,
-            "min": null,
+            "min": "0",
             "show": true
           },
           {
+            "$$hashKey": "object:1176",
             "format": "short",
             "label": null,
             "logBase": 1,
@@ -2146,7 +2332,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2154,7 +2340,8 @@
           {
             "$$hashKey": "object:311",
             "alias": "covid19_death.moving_average",
-            "fill": 0
+            "fill": 0,
+            "linewidth": 2
           }
         ],
         "spaceLength": 10,
@@ -2247,7 +2434,7 @@
                 },
                 {
                   "params": [
-                    "7"
+                    "5"
                   ],
                   "type": "moving_average"
                 }
@@ -2338,7 +2525,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2515,7 +2702,7 @@
           "alertThreshold": false
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2720,7 +2907,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -2891,7 +3078,7 @@
           "alertThreshold": false
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3078,6 +3265,176 @@
           "y": 50
         },
         "hiddenSeries": false,
+        "id": 31,
+        "legend": {
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": true,
+        "linewidth": 1,
+        "nullPointMode": "connected",
+        "options": {
+          "alertThreshold": true
+        },
+        "percentage": false,
+        "pluginVersion": "7.3.6",
+        "pointradius": 2,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [
+          {
+            "alias": "covid19_intensive.distinct",
+            "fill": 0,
+            "yaxis": 2
+          }
+        ],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "linear"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "covid19_hospital",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "distinct"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "linear"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "covid19_intensive",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT mean(\"value\") FROM \"covid19_intensive\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+            "rawQuery": false,
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "distinct"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Hospitalized and Intensive Care",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "fill": 1,
+        "fillGradient": 0,
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 50
+        },
+        "hiddenSeries": false,
         "id": 20,
         "legend": {
           "avg": false,
@@ -3095,7 +3452,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3199,131 +3556,6 @@
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 12,
-          "y": 50
-        },
-        "hiddenSeries": false,
-        "id": 8,
-        "legend": {
-          "avg": false,
-          "current": true,
-          "max": false,
-          "min": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "nullPointMode": "connected",
-        "options": {
-          "alertThreshold": true
-        },
-        "percentage": false,
-        "pluginVersion": "7.3.1",
-        "pointradius": 2,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": true,
-        "targets": [
-          {
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "measurement": "covid19_death",
-            "orderByTime": "ASC",
-            "policy": "default",
-            "refId": "A",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "distinct"
-                }
-              ]
-            ],
-            "tags": []
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeRegions": [],
-        "timeShift": null,
-        "title": "Deaths Total",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ],
-        "yaxis": {
-          "align": false,
-          "alignLevel": null
-        }
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
-        },
-        "fill": 1,
-        "fillGradient": 0,
-        "gridPos": {
-          "h": 8,
-          "w": 12,
           "x": 0,
           "y": 58
         },
@@ -3347,7 +3579,7 @@
           "alertThreshold": true
         },
         "percentage": false,
-        "pluginVersion": "7.3.1",
+        "pluginVersion": "7.3.6",
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
@@ -3433,6 +3665,258 @@
           "align": false,
           "alignLevel": null
         }
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "fill": 1,
+        "fillGradient": 0,
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 58
+        },
+        "hiddenSeries": false,
+        "id": 48,
+        "legend": {
+          "alignAsTable": false,
+          "avg": false,
+          "current": true,
+          "max": false,
+          "min": false,
+          "rightSide": false,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": true,
+        "linewidth": 1,
+        "nullPointMode": "connected",
+        "options": {
+          "alertThreshold": true
+        },
+        "percentage": false,
+        "pluginVersion": "7.3.6",
+        "pointradius": 2,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "covid19_recovered",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Recovered Total",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "fill": 1,
+        "fillGradient": 0,
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 66
+        },
+        "hiddenSeries": false,
+        "id": 8,
+        "legend": {
+          "avg": false,
+          "current": true,
+          "max": false,
+          "min": false,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": true,
+        "linewidth": 1,
+        "nullPointMode": "connected",
+        "options": {
+          "alertThreshold": true
+        },
+        "percentage": false,
+        "pluginVersion": "7.3.6",
+        "pointradius": 2,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": true,
+        "targets": [
+          {
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "covid19_death",
+            "orderByTime": "ASC",
+            "policy": "default",
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "distinct"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Deaths Total",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
       }
     ],
     "refresh": false,
@@ -3463,7 +3947,7 @@
     "timezone": "",
     "title": "Covid-19 Austria",
     "uid": "FmM6jcrZz",
-    "version": 105
+    "version": 126
   },
   "overwrite": true
 }
